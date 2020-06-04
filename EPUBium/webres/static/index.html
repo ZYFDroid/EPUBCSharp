@@ -39,6 +39,35 @@
 </script>
 
 
+<script>
+function reportLocation(){
+	var currentLocation = renderH.location.start.href;
+	console.log("::REPORT_CHAPTER:"+currentLocation);
+	
+	var page = renderH.location.start.displayed.page;
+	var total = renderH.location.start.displayed.total;
+	console.log("::REPORT_LOCATION:"+page+"/"+total);
+}
+
+function reportLocationAsync(){
+	setTimeout(function(){ reportLocation(); }, 333);
+}
+
+function reportBookInfo(){
+	console.log("::EPUBTOC:"+JSON.stringify(book.navigation.toc));
+	console.log("::EPUBINFO:"+JSON.stringify(book.package.metadata))
+
+	renderH.hooks.content.register(function(contents, view) {
+		reportLocationAsync();
+	})
+}
+
+</script>
+
+
+
+<script></script>
+
 </body>
 
 </html>

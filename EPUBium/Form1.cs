@@ -45,19 +45,13 @@ namespace EPUBium
                 Size = si.windowsize;
                 usingZoom = si.bookzoom;
             }
-            mBrowser.IsBrowserInitializedChanged += MBrowser_IsBrowserInitializedChanged;
             Icon = Properties.Resources.ic_book;
             createHotKeys();
             registerHotkeys(true);
             mBrowser.Load("http://epub.zyfdroid.com/static/index.html");
             mBrowser.ConsoleMessage += MBrowser_ConsoleMessage;
         }
-
-        private void MBrowser_IsBrowserInitializedChanged(object sender, EventArgs e)
-        {
-            
-        }
-
+        
         class SettingItem {
             public Size windowsize;
             public double bookzoom;
@@ -80,6 +74,8 @@ namespace EPUBium
             if (e.Message.StartsWith("::EPUBTOC:")) {
                 String json = e.Message.Substring("::EPUBTOC:".Length);
                 bookEntries = JsonConvert.DeserializeObject<List<BookEntry>>(json);
+                searchChapters(bookEntries);
+                mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("reportLocationAsync()");
             }
 
             if (e.Message.StartsWith("::EPUBINFO:"))
@@ -88,8 +84,35 @@ namespace EPUBium
                 BookInfo bi = JsonConvert.DeserializeObject<BookInfo>(json);
                 Program.bookName = bi.title;
                 Program.bookAuthor = bi.creator;
-                runOnUiThread(() => this.Text = Program.bookName + " " + Program.bookAuthor + " - EPUBium");
+                runOnUiThread(() => this.Text = Program.bookName + " - " + Program.bookAuthor);
             }
+
+            if (e.Message.StartsWith("::REPORT_CHAPTER:")) {
+                String href = e.Message.Substring("::REPORT_CHAPTER:".Length);
+                if (bookEntryById.ContainsKey(href)) {
+                    runOnUiThread(() => lblChapterIndicator.Text = bookEntryById[href].label.Trim());
+                    
+                }
+            }
+
+            if (e.Message.StartsWith("::REPORT_LOCATION:"))
+            {
+                String page = e.Message.Substring("::REPORT_LOCATION:".Length);
+                runOnUiThread(() => lblPageIndicator.Text = page) ;
+            }
+        }
+
+        void searchChapters(IEnumerable<BookEntry> root) {
+            root.ToList().ForEach(c => {
+                if (bookEntryById.ContainsKey(c.href)) {
+                    bookEntryById[c.href] = c;
+                }
+                else
+                {
+                    bookEntryById.Add(c.href, c);
+                }
+                searchChapters(c.subitems);
+            });
         }
 
         void initBook() {
@@ -134,20 +157,19 @@ namespace EPUBium
         }
 
         List<BookEntry> bookEntries = new List<BookEntry>();
-
+        Dictionary<String, BookEntry> bookEntryById = new Dictionary<string, BookEntry>();
         void readBookInfo() {
-            mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("console.log(\"::EPUBTOC:\"+JSON.stringify(book.navigation.toc))");
-            mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("console.log(\"::EPUBINFO:\"+JSON.stringify(book.package.metadata))");
+            mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("reportBookInfo()");
         }
 
         private void btnLeft_Click(object sender, EventArgs e)
         {
-            mBrowser.Load("javascript:renderH.prev()");
+            mBrowser.Load("javascript:renderH.prev();reportLocationAsync();");
         }
 
         private void btnRight_Click(object sender, EventArgs e)
         {
-            mBrowser.Load("javascript:renderH.next()");
+            mBrowser.Load("javascript:renderH.next();reportLocationAsync();");
         }
 
         private void inspectToolStripMenuItem_Click(object sender, EventArgs e)
@@ -167,8 +189,13 @@ namespace EPUBium
 
         void createHotKeys() {
             addHotkey(KeyModifiers.None, Keys.Left, () => { btnLeft_Click(null, null); });
+            addHotkey(KeyModifiers.None, Keys.Up, () => { btnLeft_Click(null, null); });
+            addHotkey(KeyModifiers.None, Keys.PageUp, () => { btnLeft_Click(null, null); });
             addHotkey(KeyModifiers.None, Keys.Right, () => { btnRight_Click(null, null); });
+            addHotkey(KeyModifiers.None, Keys.Down, () => { btnRight_Click(null, null); });
+            addHotkey(KeyModifiers.None, Keys.PageDown, () => { btnRight_Click(null, null); });
         }
+        
 
         void unRegisterHotKeys(bool hasPersist = false)
         {
