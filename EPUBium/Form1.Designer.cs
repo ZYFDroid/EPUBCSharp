@@ -49,7 +49,6 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnRight = new System.Windows.Forms.PictureBox();
             this.tblMain = new System.Windows.Forms.Panel();
-            this.panel3 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.lblPageIndicator = new System.Windows.Forms.Label();
             this.lblChapterIndicator = new System.Windows.Forms.Label();
@@ -58,8 +57,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnLeft)).BeginInit();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.btnRight)).BeginInit();
-            this.tblMain.SuspendLayout();
-            this.panel3.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -234,21 +231,11 @@
             // 
             // tblMain
             // 
-            this.tblMain.Controls.Add(this.panel3);
             this.tblMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblMain.Location = new System.Drawing.Point(33, 24);
             this.tblMain.Name = "tblMain";
-            this.tblMain.Size = new System.Drawing.Size(542, 701);
+            this.tblMain.Size = new System.Drawing.Size(542, 673);
             this.tblMain.TabIndex = 3;
-            // 
-            // panel3
-            // 
-            this.panel3.Controls.Add(this.tableLayoutPanel1);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel3.Location = new System.Drawing.Point(0, 673);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(542, 28);
-            this.panel3.TabIndex = 0;
             // 
             // tableLayoutPanel1
             // 
@@ -257,8 +244,8 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 80F));
             this.tableLayoutPanel1.Controls.Add(this.lblPageIndicator, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.lblChapterIndicator, 1, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(33, 697);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -296,6 +283,7 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(608, 725);
             this.Controls.Add(this.tblMain);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
@@ -313,8 +301,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnLeft)).EndInit();
             this.panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.btnRight)).EndInit();
-            this.tblMain.ResumeLayout(false);
-            this.panel3.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -344,7 +330,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Label lblPageIndicator;
         private System.Windows.Forms.Label lblChapterIndicator;
