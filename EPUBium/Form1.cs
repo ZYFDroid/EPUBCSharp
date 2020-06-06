@@ -11,6 +11,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,13 +25,9 @@ namespace EPUBium
         {
             InitializeComponent();
             IBrowserSettings bs;
-            
             mBrowser = new ChromiumWebBrowser("http://epub.zyfdroid.com/static/index.html");
-
             bs = mBrowser.BrowserSettings;
-
             mBrowser.RequestHandler = new ModifiedRequestHandler();
-
             tblMain.Controls.Add(mBrowser);
             mBrowser.Dock = DockStyle.Fill;
         }
@@ -48,8 +45,9 @@ namespace EPUBium
             Icon = Properties.Resources.ic_book;
             createHotKeys();
             registerHotkeys(true);
-            mBrowser.Load("http://epub.zyfdroid.com/static/index.html");
+            initConsoleMessageHandlers();
             mBrowser.ConsoleMessage += MBrowser_ConsoleMessage;
+            mBrowser.Load("http://epub.zyfdroid.com/static/index.html");
         }
         
         class SettingItem {
@@ -59,46 +57,64 @@ namespace EPUBium
 
         bool bookInited = false;
 
-        private void MBrowser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
-        {
-            if (e.Message.Contains("<EPUB_BOOK_INIT_START>")) {
+        Dictionary<string, Action<String>> consoleMessageHandlers = new Dictionary<string, Action<string>>();
+
+        private void initConsoleMessageHandlers() {
+            consoleMessageHandlers.Add("EPUB_BOOK_INIT_START", (a) =>
+            {
                 mBrowser.SetZoomLevel(usingZoom);
                 initBook();
-            }
+            });
 
-            if (e.Message.Contains("<EPUB_BOOK_INIT_SUCCESS>")) {
+            consoleMessageHandlers.Add("EPUB_BOOK_INIT_SUCCESS", (a) =>
+            {
                 bookInited = true;
-                readBookInfo();
-            }
+                executeJavascriptFunction("reportBookInfo");
+            });
 
-            if (e.Message.StartsWith("::EPUBTOC:")) {
-                String json = e.Message.Substring("::EPUBTOC:".Length);
+            consoleMessageHandlers.Add("EPUBTOC", (json) =>
+            {
                 bookEntries = JsonConvert.DeserializeObject<List<BookEntry>>(json);
                 searchChapters(bookEntries);
-                mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("reportLocationAsync()");
-            }
+                executeJavascriptFunction("reportLocationAsync");
+            });
 
-            if (e.Message.StartsWith("::EPUBINFO:"))
+            consoleMessageHandlers.Add("EPUBINFO", (json) =>
             {
-                String json = e.Message.Substring("::EPUBINFO:".Length);
                 BookInfo bi = JsonConvert.DeserializeObject<BookInfo>(json);
                 Program.bookName = bi.title;
                 Program.bookAuthor = bi.creator;
-                runOnUiThread(() => this.Text = Program.bookName + " - " + Program.bookAuthor);
-            }
+                this.Text = Program.bookName + " - " + Program.bookAuthor;
+            });
 
-            if (e.Message.StartsWith("::REPORT_CHAPTER:")) {
-                String href = e.Message.Substring("::REPORT_CHAPTER:".Length);
-                if (bookEntryById.ContainsKey(href)) {
-                    runOnUiThread(() => lblChapterIndicator.Text = bookEntryById[href].label.Trim());
-                    
-                }
-            }
-
-            if (e.Message.StartsWith("::REPORT_LOCATION:"))
+            consoleMessageHandlers.Add("REPORT_CHAPTER", (href) =>
             {
-                String page = e.Message.Substring("::REPORT_LOCATION:".Length);
-                runOnUiThread(() => lblPageIndicator.Text = page) ;
+                if (bookEntryById.ContainsKey(href))
+                {
+                    lblChapterIndicator.Text = bookEntryById[href].label.Trim();
+                }
+            });
+
+            consoleMessageHandlers.Add("REPORT_LOCATION", (page) =>
+            {
+                lblPageIndicator.Text = page;
+            });
+        }
+
+        private void MBrowser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
+        {
+            if (e.Message.StartsWith("<::")) {
+                int end = e.Message.IndexOf(':', 3);
+                string type = (e.Message.Substring(3, end - 3));
+                string data = (e.Message.Substring(end + 1));
+
+                if (consoleMessageHandlers.ContainsKey(type))
+                {
+                    Invoke(consoleMessageHandlers[type], data);
+                }
+                else {
+                    Console.WriteLine("Dropped event " + type + " with data " + data);
+                }
             }
         }
 
@@ -125,57 +141,65 @@ namespace EPUBium
                 Application.Exit();
             }
             XDocument xld = XDocument.Load(metaFile);
-
             XElement temp = xld.Elements().Where(w => w.Name.LocalName == "container").First();
-
             temp = temp.Elements().Where(w => w.Name.LocalName == "rootfiles").First();
             temp = temp.Elements().Where(w => w.Name.LocalName == "rootfile").First();
-
             String opf = temp.Attribute("full-path").Value;
-
-            String script = "var book = ePub(\"../book/" + opf.Replace("\"", "\\\"") + "\");var renderH = book.renderTo(\"epubsub\");renderH.themes.fontSize(15);var displayed = renderH.display().then(()=>{console.log(\"<EPUB_BOOK_INIT_SUCCESS>\")});";
-
             String locationFile = Path.Combine("bookinfo", Program.bookID, "readingposition.json");
-
+            String location = "";
             if (File.Exists(locationFile))
             {
-                script += "renderH.display(\"" + File.ReadAllText(locationFile) + "\");";
+                location = File.ReadAllText(locationFile);
             }
-            mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(script);
-
-
+            executeJavascriptFunction("loadBookAtUrl", opf, location);
         }
 
-        public void runOnUiThread(Action act) {
-            if (InvokeRequired)
+        public void executeJavascriptFunction(String functionName, params object[] arguments) {
+            StringBuilder scriptBuilder = new StringBuilder();
+            scriptBuilder.Append(functionName).Append("(");
+            for (int i = 0; i < arguments.Length; i++)
             {
-                Invoke(act);
+                object obj = arguments[i];
+                if (obj == null) {
+                    scriptBuilder.Append("null");
+                } else if (obj is string)
+                {
+                    scriptBuilder.Append((obj as string).escapeText());
+                }
+                else if (obj is bool) {
+                    scriptBuilder.Append(obj.ToString().ToLower());
+                }
+                else {
+                    scriptBuilder.Append(obj.ToString());
+                }
+                if (i != arguments.Length - 1) {
+                    scriptBuilder.Append(",");
+                };
             }
-            else {
-                act.Invoke();
-            }
+            scriptBuilder.Append(");");
+            mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(scriptBuilder.ToString());
         }
 
         List<BookEntry> bookEntries = new List<BookEntry>();
         Dictionary<String, BookEntry> bookEntryById = new Dictionary<string, BookEntry>();
-        void readBookInfo() {
-            mBrowser.GetBrowser().MainFrame.ExecuteJavaScriptAsync("reportBookInfo()");
-        }
 
         private void btnLeft_Click(object sender, EventArgs e)
         {
-            mBrowser.Load("javascript:renderH.prev();reportLocationAsync();");
+            executeJavascriptFunction("prev");
         }
 
         private void btnRight_Click(object sender, EventArgs e)
         {
-            mBrowser.Load("javascript:renderH.next();reportLocationAsync();");
+
+            executeJavascriptFunction("next");
         }
 
         private void inspectToolStripMenuItem_Click(object sender, EventArgs e)
         {
             mBrowser.GetBrowser().GetHost().ShowDevTools();
         }
+
+        #region Hotkeys
 
         private void Form1_Activated(object sender, EventArgs e)
         {
@@ -280,6 +304,9 @@ namespace EPUBium
             public bool persist = false;
         }
 
+        #endregion
+
+        #region epubjs invoke
         class ModifiedRequestHandler : RequestHandler {
             ModifiedResourceHandler mResHandler = new ModifiedResourceHandler();
             protected override IResourceRequestHandler GetResourceRequestHandler(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IRequest request, bool isNavigation, bool isDownload, string requestInitiator, ref bool disableDefaultHandling)
@@ -315,13 +342,14 @@ namespace EPUBium
                 return base.GetResourceHandler(chromiumWebBrowser, browser, frame, request);
             }
         }
-
+        #endregion
+        
+        #region UI 
         private void mnuChapter_Click(object sender, EventArgs e)
         {
             if (!bookInited) { return; }
             FrmChapters chapters = new FrmChapters();
             TreeView v = chapters.treeView1;
-
             TreeNode root = new TreeNode(Program.bookName);
             addNodes(root, bookEntries);
             v.Nodes.Add(root);
@@ -333,7 +361,7 @@ namespace EPUBium
                     String str = ev.Node.Tag as String;
                     if (null != str)
                     {
-                        mBrowser.Load("javascript:renderH.display(\"" + str.Replace("\"", "\\\"") + "\");");
+                        executeJavascriptFunction("renderH.display", str);
                         chapters.Close();
                     }
                 }
@@ -354,14 +382,20 @@ namespace EPUBium
             Close();
         }
 
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            e.Cancel = true;
             File.WriteAllText(Path.Combine(Program.openingPath, "setting.json"), JsonConvert.SerializeObject(new SettingItem() {bookzoom = usingZoom,windowsize = Size }));
             if (!bookInited) { return; }
-            Task<JavascriptResponse> jsr = mBrowser.GetBrowser().MainFrame.EvaluateScriptAsync("renderH.location.start.cfi");
-            jsr.Wait();
-            String location = jsr.Result.Result.ToString();
-            File.WriteAllText(Path.Combine("bookinfo", Program.bookID, "readingposition.json"), location);
+            if (!consoleMessageHandlers.ContainsKey("EXIT_SAVING")) {
+                consoleMessageHandlers.Add("EXIT_SAVING", cfi => {
+                    File.WriteAllText(Path.Combine("bookinfo", Program.bookID, "readingposition.json"), cfi);
+                    this.FormClosing -= Form1_FormClosing;
+                    Close();
+                });
+            }
+            executeJavascriptFunction("reportReadingProgressBeforeExit");
         }
 
         private double usingZoom = 0;
@@ -399,13 +433,16 @@ namespace EPUBium
         private void toolStripMenuItem4_Click_1(object sender, EventArgs e)
         {
             if (!bookInited) { return; }
-            Task<JavascriptResponse> jsr = mBrowser.GetBrowser().MainFrame.EvaluateScriptAsync("renderH.location.start.cfi");
-            jsr.Wait();
-            String location = jsr.Result.Result.ToString();
-            ShortTextWindow dlg = new ShortTextWindow();
-            dlg.textBox1.Text = location;
-            dlg.ShowDialog();
-            dlg.Dispose();
+            if (!consoleMessageHandlers.ContainsKey("GET_SAVING"))
+            {
+                consoleMessageHandlers.Add("GET_SAVING", cfi => {
+                    ShortTextWindow dlg = new ShortTextWindow();
+                    dlg.textBox1.Text = cfi;
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                });
+            }
+            executeJavascriptFunction("reportReadingProgress");
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -414,15 +451,21 @@ namespace EPUBium
             if (dlg.ShowDialog() == DialogResult.OK) {
                 String cfi = dlg.textBox1.Text;
                 dlg.Dispose();
-                if (cfi.Length > 2)
+                if (cfi.Length > 7)
                 {
-                    mBrowser.Load("javascript:renderH.display(\"" + cfi.Replace("\\","\\\\").Replace("\"", "\\\"") + "\");");
+                    executeJavascriptFunction("renderH.display", cfi);
                 }
                 else {
                     MessageBox.Show("Invalid CFI Location");
                 }
             }
         }
+
+        private void clearCacheToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+        }
+
+        #endregion
     }
 
 
@@ -458,6 +501,32 @@ namespace EPUBium
     {
         public String title;
         public String creator;
+    }
+
+    public static class TextUtils {
+
+        public static string escapeText(this string src)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("\"");
+            foreach (char chr in src.ToCharArray())
+            {
+                switch (chr) {
+                    case '\0': sb.Append("\\0");break;
+                    case '\b': sb.Append("\\b");break;
+                    case '\t': sb.Append("\\t");break;
+                    case '\n': sb.Append("\\n");break;
+                    case '\u000B': sb.Append("\\v");break;
+                    case '\u000C': sb.Append("\\f");break;
+                    case '\r': sb.Append("\\f");break;
+                    case '\"': sb.Append("\\\"");break;
+                    case '\'': sb.Append("\\\'");break;
+                    case '\\': sb.Append("\\\\");break;
+                    default: sb.Append(chr);break;
+                }
+            }
+            return sb.Append("\"").ToString();
+        }
     }
 
 }

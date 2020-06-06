@@ -16,5 +16,10 @@ namespace EPUBium
         {
             InitializeComponent();
         }
+
+        private void ShortTextWindow_Load(object sender, EventArgs e)
+        {
+            this.Icon = Properties.Resources.ic_book;
+        }
     }
 }

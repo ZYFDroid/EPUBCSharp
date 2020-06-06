@@ -68,7 +68,7 @@
             this.aboutToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(608, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(608, 25);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -80,40 +80,40 @@
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            this.fileToolStripMenuItem.Text = "&File";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(62, 21);
+            this.fileToolStripMenuItem.Text = "文件 (&F)";
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(183, 22);
-            this.toolStripMenuItem4.Text = "Get reading progress";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem4.Text = "获取阅读进度";
             this.toolStripMenuItem4.Click += new System.EventHandler(this.toolStripMenuItem4_Click_1);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(183, 22);
-            this.toolStripMenuItem1.Text = "Set reading progress";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem1.Text = "读取阅读进度";
             this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.exitToolStripMenuItem.Text = "&Exit";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Text = "退出 (&X)";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // mnuChapter
             // 
             this.mnuChapter.Name = "mnuChapter";
-            this.mnuChapter.Size = new System.Drawing.Size(66, 20);
-            this.mnuChapter.Text = "&Chapters";
+            this.mnuChapter.Size = new System.Drawing.Size(64, 21);
+            this.mnuChapter.Text = "章节 (&C)";
             this.mnuChapter.Click += new System.EventHandler(this.mnuChapter_Click);
             // 
             // aboutToolStripMenuItem
@@ -123,22 +123,23 @@
             this.clearCacheToolStripMenuItem,
             this.zoomToolStripMenuItem1});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
-            this.aboutToolStripMenuItem.Text = "&Option";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(66, 21);
+            this.aboutToolStripMenuItem.Text = "选项 (&O)";
             // 
             // inspectToolStripMenuItem
             // 
             this.inspectToolStripMenuItem.Name = "inspectToolStripMenuItem";
-            this.inspectToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.inspectToolStripMenuItem.Text = "Inspect";
+            this.inspectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.inspectToolStripMenuItem.Text = "开发者模式";
             this.inspectToolStripMenuItem.Click += new System.EventHandler(this.inspectToolStripMenuItem_Click);
             // 
             // clearCacheToolStripMenuItem
             // 
             this.clearCacheToolStripMenuItem.Name = "clearCacheToolStripMenuItem";
-            this.clearCacheToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
-            this.clearCacheToolStripMenuItem.Text = "Clear Cache";
+            this.clearCacheToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearCacheToolStripMenuItem.Text = "清空缓存";
             this.clearCacheToolStripMenuItem.Visible = false;
+            this.clearCacheToolStripMenuItem.Click += new System.EventHandler(this.clearCacheToolStripMenuItem_Click);
             // 
             // zoomToolStripMenuItem1
             // 
@@ -149,41 +150,41 @@
             this.toolStripMenuItem2,
             this.toolStripMenuItem3});
             this.zoomToolStripMenuItem1.Name = "zoomToolStripMenuItem1";
-            this.zoomToolStripMenuItem1.Size = new System.Drawing.Size(137, 22);
-            this.zoomToolStripMenuItem1.Text = "Zoom";
+            this.zoomToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.zoomToolStripMenuItem1.Text = "缩放";
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(102, 22);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem5.Text = "100%";
             this.toolStripMenuItem5.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(102, 22);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem6.Text = "125%";
             this.toolStripMenuItem6.Click += new System.EventHandler(this.toolStripMenuItem3_Click);
             // 
             // toolStripMenuItem7
             // 
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(102, 22);
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem7.Text = "150%";
             this.toolStripMenuItem7.Click += new System.EventHandler(this.toolStripMenuItem4_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(102, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem2.Text = "175%";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click_1);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(102, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItem3.Text = "200%";
             this.toolStripMenuItem3.Click += new System.EventHandler(this.toolStripMenuItem3_Click_1);
             // 
@@ -191,9 +192,9 @@
             // 
             this.panel1.Controls.Add(this.btnLeft);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 24);
+            this.panel1.Location = new System.Drawing.Point(0, 25);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(33, 701);
+            this.panel1.Size = new System.Drawing.Size(33, 644);
             this.panel1.TabIndex = 1;
             // 
             // btnLeft
@@ -202,7 +203,7 @@
             this.btnLeft.Image = global::EPUBium.Properties.Resources.ic_left;
             this.btnLeft.Location = new System.Drawing.Point(0, 0);
             this.btnLeft.Name = "btnLeft";
-            this.btnLeft.Size = new System.Drawing.Size(33, 701);
+            this.btnLeft.Size = new System.Drawing.Size(33, 644);
             this.btnLeft.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.btnLeft.TabIndex = 0;
             this.btnLeft.TabStop = false;
@@ -212,9 +213,9 @@
             // 
             this.panel2.Controls.Add(this.btnRight);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(575, 24);
+            this.panel2.Location = new System.Drawing.Point(575, 25);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(33, 701);
+            this.panel2.Size = new System.Drawing.Size(33, 644);
             this.panel2.TabIndex = 2;
             // 
             // btnRight
@@ -223,7 +224,7 @@
             this.btnRight.Image = global::EPUBium.Properties.Resources.ic_right;
             this.btnRight.Location = new System.Drawing.Point(0, 0);
             this.btnRight.Name = "btnRight";
-            this.btnRight.Size = new System.Drawing.Size(33, 701);
+            this.btnRight.Size = new System.Drawing.Size(33, 644);
             this.btnRight.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.btnRight.TabIndex = 0;
             this.btnRight.TabStop = false;
@@ -232,24 +233,24 @@
             // tblMain
             // 
             this.tblMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblMain.Location = new System.Drawing.Point(33, 24);
+            this.tblMain.Location = new System.Drawing.Point(33, 25);
             this.tblMain.Name = "tblMain";
-            this.tblMain.Size = new System.Drawing.Size(542, 673);
+            this.tblMain.Size = new System.Drawing.Size(542, 612);
             this.tblMain.TabIndex = 3;
             // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 80F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 23.24723F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 76.75277F));
             this.tableLayoutPanel1.Controls.Add(this.lblPageIndicator, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.lblChapterIndicator, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(33, 697);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(33, 637);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(542, 28);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(542, 32);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // lblPageIndicator
@@ -259,7 +260,7 @@
             this.lblPageIndicator.ForeColor = System.Drawing.SystemColors.ButtonShadow;
             this.lblPageIndicator.Location = new System.Drawing.Point(3, 0);
             this.lblPageIndicator.Name = "lblPageIndicator";
-            this.lblPageIndicator.Size = new System.Drawing.Size(102, 28);
+            this.lblPageIndicator.Size = new System.Drawing.Size(119, 32);
             this.lblPageIndicator.TabIndex = 0;
             this.lblPageIndicator.Text = "   ";
             this.lblPageIndicator.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -269,25 +270,26 @@
             this.lblChapterIndicator.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblChapterIndicator.Font = new System.Drawing.Font("Comic Sans MS", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblChapterIndicator.ForeColor = System.Drawing.SystemColors.ButtonShadow;
-            this.lblChapterIndicator.Location = new System.Drawing.Point(111, 0);
+            this.lblChapterIndicator.Location = new System.Drawing.Point(128, 0);
             this.lblChapterIndicator.Name = "lblChapterIndicator";
-            this.lblChapterIndicator.Size = new System.Drawing.Size(428, 28);
+            this.lblChapterIndicator.Size = new System.Drawing.Size(411, 32);
             this.lblChapterIndicator.TabIndex = 0;
             this.lblChapterIndicator.Text = "   ";
             this.lblChapterIndicator.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(608, 725);
+            this.ClientSize = new System.Drawing.Size(608, 669);
             this.Controls.Add(this.tblMain);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.MinimumSize = new System.Drawing.Size(480, 640);
             this.Name = "Form1";
             this.Text = "EPubium";
             this.Activated += new System.EventHandler(this.Form1_Activated);

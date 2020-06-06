@@ -1,30 +1,30 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <style>
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        body,
+        html {
+            height: 100%;
+        }
+
+
+        .content {
+            height: 100%;
+            display: flex;
+        }
+    </style>
 </head>
-<style>
-  
-   * {
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-
-  body,
-  html {
-    height: 100%;
-  }
-
-
-  .content {
-    height: 100%;
-    display: flex;
-  }
-  
-  
-</style>
 
 
 <body style="width: 100%; height: 100%">
@@ -35,38 +35,71 @@
 <div id="epubsub" class="content"></div>
 
 <script>
-    console.log("<EPUB_BOOK_INIT_START>");
+    var book = null;
+    var renderH = null;
+    function reportMessage(type, content) {
+        console.log("<::" + type + ":" + content);
+    }
+
+    function reportLocation(){
+    	var currentLocation = renderH.location.start.href;
+    	console.log("<::REPORT_CHAPTER:"+currentLocation);
+    	
+    	var page = renderH.location.start.displayed.page;
+    	var total = renderH.location.start.displayed.total;
+    	console.log("<::REPORT_LOCATION:"+page+"/"+total);
+    }
+
+    function reportReadingProgressBeforeExit() {
+        reportMessage("EXIT_SAVING", renderH.location.start.cfi);
+    }
+
+
+    function reportReadingProgress() {
+        reportMessage("GET_SAVING", renderH.location.start.cfi);
+    }
+
+
+    function reportLocationAsync(){
+    	setTimeout(function(){ reportLocation(); }, 333);
+    }
+    
+    function reportBookInfo(){
+    	console.log("<::EPUBTOC:"+JSON.stringify(book.navigation.toc));
+    	console.log("<::EPUBINFO:"+JSON.stringify(book.package.metadata))
+    
+    	renderH.hooks.content.register(function(contents, view) {
+    		reportLocationAsync();
+    	})
+    }
+    
+    function loadBookAtUrl(url,startlocation) {
+        book = ePub("../book/" + url);
+        renderH = book.renderTo("epubsub");
+        renderH.themes.fontSize(15);
+        renderH.display().then(() => { reportMessage("EPUB_BOOK_INIT_SUCCESS") });
+        if (startlocation.length && startlocation.length > 0) {
+            renderH.display(startlocation);
+        }
+    }
+
+
+    function prev() {
+        renderH.prev();
+        reportLocationAsync();
+    }
+
+    function next() {
+        renderH.next();
+        reportLocationAsync();
+    }
 </script>
+
 
 
 <script>
-function reportLocation(){
-	var currentLocation = renderH.location.start.href;
-	console.log("::REPORT_CHAPTER:"+currentLocation);
-	
-	var page = renderH.location.start.displayed.page;
-	var total = renderH.location.start.displayed.total;
-	console.log("::REPORT_LOCATION:"+page+"/"+total);
-}
-
-function reportLocationAsync(){
-	setTimeout(function(){ reportLocation(); }, 333);
-}
-
-function reportBookInfo(){
-	console.log("::EPUBTOC:"+JSON.stringify(book.navigation.toc));
-	console.log("::EPUBINFO:"+JSON.stringify(book.package.metadata))
-
-	renderH.hooks.content.register(function(contents, view) {
-		reportLocationAsync();
-	})
-}
-
+    console.log("<::EPUB_BOOK_INIT_START:");
 </script>
-
-
-
-<script></script>
 
 </body>
 

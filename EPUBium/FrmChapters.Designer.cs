@@ -36,19 +36,20 @@
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(416, 411);
+            this.treeView1.Size = new System.Drawing.Size(416, 379);
             this.treeView1.TabIndex = 0;
             // 
             // FrmChapters
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(416, 411);
+            this.ClientSize = new System.Drawing.Size(416, 379);
             this.Controls.Add(this.treeView1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "FrmChapters";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Chapters";
+            this.Text = "章节列表";
+            this.Load += new System.EventHandler(this.FrmChapters_Load);
             this.ResumeLayout(false);
 
         }
