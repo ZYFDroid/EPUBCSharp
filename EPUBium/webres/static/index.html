@@ -41,13 +41,13 @@
         console.log("<::" + type + ":" + content);
     }
 
-    function reportLocation(){
-    	var currentLocation = renderH.location.start.href;
-    	console.log("<::REPORT_CHAPTER:"+currentLocation);
-    	
-    	var page = renderH.location.start.displayed.page;
-    	var total = renderH.location.start.displayed.total;
-    	console.log("<::REPORT_LOCATION:"+page+"/"+total);
+    function reportLocation() {
+        var currentLocation = renderH.location.start.href;
+        reportMessage("REPORT_CHAPTER", currentLocation);
+
+        var page = renderH.location.start.displayed.page;
+        var total = renderH.location.start.displayed.total;
+        reportMessage("REPORT_LOCATION", page + "/" + total)
     }
 
     function reportReadingProgressBeforeExit() {
@@ -60,20 +60,20 @@
     }
 
 
-    function reportLocationAsync(){
-    	setTimeout(function(){ reportLocation(); }, 333);
+    function reportLocationAsync() {
+        setTimeout(function () { reportLocation(); }, 333);
     }
-    
-    function reportBookInfo(){
-    	console.log("<::EPUBTOC:"+JSON.stringify(book.navigation.toc));
-    	console.log("<::EPUBINFO:"+JSON.stringify(book.package.metadata))
-    
-    	renderH.hooks.content.register(function(contents, view) {
-    		reportLocationAsync();
-    	})
+
+    function reportBookInfo() {
+        reportMessage("EPUBTOC", JSON.stringify(book.navigation.toc));
+        reportMessage("EPUBINFO", JSON.stringify(book.package.metadata));
+
+        renderH.hooks.content.register(function (contents, view) {
+            reportLocationAsync();
+        })
     }
-    
-    function loadBookAtUrl(url,startlocation) {
+
+    function loadBookAtUrl(url, startlocation) {
         book = ePub("../book/" + url);
         renderH = book.renderTo("epubsub");
         renderH.themes.fontSize(15);
@@ -98,7 +98,7 @@
 
 
 <script>
-    console.log("<::EPUB_BOOK_INIT_START:");
+    reportMessage("EPUB_BOOK_INIT_START", "OK");
 </script>
 
 </body>

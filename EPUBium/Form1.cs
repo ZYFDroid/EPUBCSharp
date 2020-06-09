@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -48,8 +49,53 @@ namespace EPUBium
             initConsoleMessageHandlers();
             mBrowser.ConsoleMessage += MBrowser_ConsoleMessage;
             mBrowser.Load("http://epub.zyfdroid.com/static/index.html");
+            mBrowser.MenuHandler = new MyMenu(this);
         }
-        
+
+        class MyMenu : IContextMenuHandler
+        {
+            Form1 _this;
+
+            public MyMenu(Form1 @this)
+            {
+                _this = @this;
+            }
+
+            public void OnBeforeContextMenu(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model)
+            {
+                if (parameters.HasImageContents || parameters.SelectionText != "")
+                {
+                    model.AddSeparator();
+                    model.AddItem(CefMenuCommand.UserFirst + 1, "加入笔记");
+                }
+            }
+
+            public bool OnContextMenuCommand(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IContextMenuParams parameters, CefMenuCommand commandId, CefEventFlags eventFlags)
+            {
+                if (commandId == CefMenuCommand.UserFirst + 1) {
+                    if (parameters.HasImageContents)
+                    {
+                        _this.Invoke(new Action<string>(_this.onNoteImageArrival), parameters.SourceUrl);
+                    }
+                    else if(parameters.SelectionText !="") {
+                        _this.Invoke(new Action<string>(_this.onNoteTextArrival), parameters.SelectionText);
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            public void OnContextMenuDismissed(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame)
+            {
+                
+            }
+
+            public bool RunContextMenu(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model, IRunContextMenuCallback callback)
+            {
+                return false;
+            }
+        }
+
         class SettingItem {
             public Size windowsize;
             public double bookzoom;
@@ -461,11 +507,47 @@ namespace EPUBium
             }
         }
 
+        public void onNoteImageArrival(string url) {
+            string path = url.Replace("http://epub.zyfdroid.com/book", Program.openingPath).Replace("/", "\\");
+            string outname = "";
+            string notePath = Path.Combine(Program.openingPath, "notes");
+            if (!Directory.Exists(notePath)) { Directory.CreateDirectory(notePath); }
+            if (FrmFileNameDialog.show(out outname)) {
+                if (File.Exists(path))
+                {
+                    File.Copy(path, Path.Combine(notePath, outname + Path.GetExtension(path)),true);
+                    MessageBox.Show("笔记保存成功。（刷新笔记查看）");
+                }
+                else {
+                    MessageBox.Show("系统找不到指定的文件");
+                }
+            }
+        }
+
+        public void onNoteTextArrival(string text) {
+            string outname = "";
+            string notePath = Path.Combine(Program.openingPath, "notes");
+            if (!Directory.Exists(notePath)) { Directory.CreateDirectory(notePath); }
+            if (FrmFileNameDialog.show(out outname))
+            {
+                File.WriteAllText(Path.Combine(notePath, outname + ".txt"), text);
+                MessageBox.Show("笔记保存成功。（刷新笔记查看）");
+            }
+        }
+
         private void clearCacheToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
         }
 
         #endregion
+
+        private void toolStripMenuItem8_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo(Path.GetFullPath("EBookNote.exe"));
+            psi.WorkingDirectory = Program.openingPath;
+            Process.Start(psi);
+        }
     }
 
 
@@ -477,9 +559,6 @@ namespace EPUBium
         [DllImport("user32.dll")]
         public static extern bool UnregisterHotKey(IntPtr hWnd, int id);
         public const int WM_HOTKEYS = 0x0312;
-
-        [DllImport("gdi32.dll")]
-        public static extern int BitBlt(IntPtr hDestDC, int x, int y, int nWidth, int nHeight, IntPtr hSrcDC, int xSrc, int ySrc, int dwRop);
     }
     public enum KeyModifiers
     {
@@ -490,19 +569,22 @@ namespace EPUBium
         WindowsKey = 8
     }
 
+#pragma warning disable CS0649
+
     class BookEntry {
-        public String id;
-        public String href;
-        public String label;
+        public string id;
+        public string href;
+        public string label;
         public List<BookEntry> subitems;
     }
 
     class BookInfo
     {
-        public String title;
-        public String creator;
+        public string title;
+        public string creator;
     }
 
+#pragma warning restore CS0649
     public static class TextUtils {
 
         public static string escapeText(this string src)
