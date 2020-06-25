@@ -105,6 +105,9 @@ namespace EPUBium
 
         Dictionary<string, Action<String>> consoleMessageHandlers = new Dictionary<string, Action<string>>();
 
+
+        String currentProgress = "";
+
         private void initConsoleMessageHandlers() {
             consoleMessageHandlers.Add("EPUB_BOOK_INIT_START", (a) =>
             {
@@ -145,6 +148,8 @@ namespace EPUBium
             {
                 lblPageIndicator.Text = page;
             });
+
+            consoleMessageHandlers.Add("GET_SAVING", (rp) => currentProgress = rp);
         }
 
         private void MBrowser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
@@ -431,17 +436,8 @@ namespace EPUBium
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
             File.WriteAllText(Path.Combine(Program.openingPath, "setting.json"), JsonConvert.SerializeObject(new SettingItem() {bookzoom = usingZoom,windowsize = Size }));
-            if (!bookInited) { return; }
-            if (!consoleMessageHandlers.ContainsKey("EXIT_SAVING")) {
-                consoleMessageHandlers.Add("EXIT_SAVING", cfi => {
-                    File.WriteAllText(Path.Combine("bookinfo", Program.bookID, "readingposition.json"), cfi);
-                    this.FormClosing -= Form1_FormClosing;
-                    Close();
-                });
-            }
-            executeJavascriptFunction("reportReadingProgressBeforeExit");
+            File.WriteAllText(Path.Combine("bookinfo", Program.bookID, "readingposition.json"), currentProgress);
         }
 
         private double usingZoom = 0;
@@ -479,16 +475,10 @@ namespace EPUBium
         private void toolStripMenuItem4_Click_1(object sender, EventArgs e)
         {
             if (!bookInited) { return; }
-            if (!consoleMessageHandlers.ContainsKey("GET_SAVING"))
-            {
-                consoleMessageHandlers.Add("GET_SAVING", cfi => {
-                    ShortTextWindow dlg = new ShortTextWindow();
-                    dlg.textBox1.Text = cfi;
-                    dlg.ShowDialog();
-                    dlg.Dispose();
-                });
-            }
-            executeJavascriptFunction("reportReadingProgress");
+            ShortTextWindow dlg = new ShortTextWindow();
+            dlg.textBox1.Text = currentProgress;
+            dlg.ShowDialog();
+            dlg.Dispose();
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)

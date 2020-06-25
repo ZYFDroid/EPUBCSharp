@@ -37,6 +37,8 @@
 <script>
     var book = null;
     var renderH = null;
+	var rootView = null;
+
     function reportMessage(type, content) {
         console.log("<::" + type + ":" + content);
     }
@@ -48,6 +50,8 @@
         var page = renderH.location.start.displayed.page;
         var total = renderH.location.start.displayed.total;
         reportMessage("REPORT_LOCATION", page + "/" + total)
+
+		reportReadingProgress();
     }
 
     function reportReadingProgressBeforeExit() {
@@ -74,6 +78,7 @@
     }
 
     function loadBookAtUrl(url, startlocation) {
+	    rootView = document.getElementById("epubsub");
         book = ePub("../book/" + url);
         renderH = book.renderTo("epubsub");
         renderH.themes.fontSize(15);
@@ -81,8 +86,55 @@
         if (startlocation.length && startlocation.length > 0) {
             renderH.display(startlocation);
         }
-    }
 
+		renderH.hooks.content.register(
+             function(){
+
+                renderH.getContents().forEach(c => adjustTheFxxkingImage(c));
+             }
+
+        );
+
+    }
+	
+    // 感谢17soft老板提供的离线dev调试工具
+
+    //有些epub编辑乱写html样式，导致显示错乱还得让我们这些编写阅读器的来修复bug
+    //举例: 设置div对象的marggin然后设置width为100%，导致当前页的内容跑到下一页去
+    //举例2: 写死div对象宽度，导致这一页内容跑到下一页去
+    //不得不写一个for循环遍历外层元素是否超过页面宽度
+    //就怕那些又设置padding又写死width的
+    //最离谱的是：我明明不会css和js，随便编了一段代码，然后这段代码正常工作并修复了所有图片
+
+	
+    function adjustTheFxxkingImage(mainDoc){
+        let rules = {
+                        "img": {
+                            "max-width": "100% !important"
+                        },
+                    };
+        mainDoc.addStylesheetRules(rules);
+        //标准100%
+        var maxWidth = document.getElementById("epubsub").clientWidth;
+        //页面宽度
+        var imgs = mainDoc.document.getElementsByTagName("img");
+        //遍历所有img元素
+        for(var i=0;i<imgs.length;i++){
+            var imgTag = imgs[i];
+            var currentTag = imgTag;
+            //遍历外层元素
+            while(currentTag != mainDoc.document.body){
+                var computedstyle = getComputedStyle(currentTag);
+                if(computedstyle.width.replace("px","") * 1 +
+                                    computedstyle.marginLeft.replace("px","") * 1 > maxWidth){
+                    currentTag.style.width = "100%";
+                    currentTag.style.marginLeft = "0px";
+                    //去掉margin，还有width
+                }
+                currentTag = currentTag.parentNode;
+            }
+        }
+    }
 
     function prev() {
         renderH.prev();
