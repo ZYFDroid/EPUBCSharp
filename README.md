@@ -1,4 +1,4 @@
-# 已过时。使用[EPUBiumDesktop]{https://github.com/ZYFDroid/EPUBiumDesktop}代替
+# 已过时。使用[EPUBiumDesktop](https://github.com/ZYFDroid/EPUBiumDesktop)代替
 
 # EPUBCSharp
 
