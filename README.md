@@ -1,3 +1,5 @@
+# 已过时。使用[EPUBiumDesktop]{https://github.com/ZYFDroid/EPUBiumDesktop}代替
+
 # EPUBCSharp
 
 使用 epub.js + CEFSharp
